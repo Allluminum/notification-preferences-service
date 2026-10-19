@@ -379,6 +379,7 @@ describe('Observability', () => {
     expect(events).toContainEqual(
       expect.objectContaining({
         event: 'preferences_updated',
+        reqId: expect.any(String) as string,
         userId: 'user-1',
         version: 1,
         changes: [

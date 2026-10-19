@@ -5,6 +5,7 @@ import { EvaluationService } from './application/evaluation-service.js';
 import { PreferencesService } from './application/preferences-service.js';
 import type { DbPool } from './infrastructure/db/pool.js';
 import { PrometheusMetrics } from './infrastructure/observability/metrics.js';
+import { ContextualLogger } from './infrastructure/observability/request-logger.js';
 import {
   PgDefaultPreferencesRepository,
   PgPolicyRepository,
@@ -37,7 +38,10 @@ export const createApp = (options: AppOptions): FastifyInstance => {
 
   const { pool } = options;
   const metrics = options.metrics ?? new PrometheusMetrics();
-  const logger = app.log;
+  const logger = new ContextualLogger(app.log);
+  app.addHook('onRequest', (request, _reply, done) => {
+    logger.runWith(request.log, done);
+  });
 
   const users = new PgUserPreferencesReader(pool);
   const defaults = new PgDefaultPreferencesRepository(pool);
