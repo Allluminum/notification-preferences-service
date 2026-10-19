@@ -53,7 +53,7 @@ export const createApp = (options: AppOptions): FastifyInstance => {
     void reply.header('x-request-id', request.id);
   });
 
-  app.get('/health/live', async () => ({ status: 'ok' }));
+  app.get('/health/live', (_request, reply) => reply.send({ status: 'ok' }));
   app.get('/health/ready', async (_request, reply) => {
     try {
       await pool.query('SELECT 1');
